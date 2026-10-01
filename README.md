@@ -22,10 +22,10 @@ FoneCall requires .NET Framework 4.8 or higher which is included in the followin
 > + Windows Server: Windows Server 2019 (starting with version 1903 updates), Windows Server 2022, and Windows Server 2025.
 *(Source: Google search)*
 
-If your OS doesn’t already include support for DNFV 4.8 the installer is available [on this site](releases/latest) or if you prefer you can [download  from Microsoft]( https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
+If your OS doesn’t already include support for DNFV 4.8 the installer is available [on this site](releases/tag/1.0) or if you prefer you can [download  from Microsoft]( https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
 
 ### Get FoneCall
-[Download FoneCall](releases/latest)
+[Download FoneCall](releases/tag/1.0)
 
 FoneCall is tested for use exclusively with the official version of scrcpy.
 (<https://github.com/Genymobile/scrcpy>). 
