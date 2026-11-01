@@ -1,5 +1,5 @@
-Required Notice: Copyright 2026 LifesRain. All rights reserved.
-Required Notice: Licensed under the PolyForm Noncommercial License 1.0.0.
+Required Notice: Copyright 2026 LifesRain. All rights reserved.  
+Required Notice: Licensed under the PolyForm Noncommercial License 1.0.0.  
 Required Notice: Repository source available at https://github.com
 
 # PolyForm Noncommercial License 1.0.0
