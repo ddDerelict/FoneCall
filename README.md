@@ -87,13 +87,14 @@ Get the latest installation package directly from our repository
  
 #### ⚖️ Licensing & Commercial Use
 
-This software is distributed under the **PolyForm Noncommercial License 1.0.0**. 
+This software is distributed under the [PolyForm Noncommercial License 1.0.0](LICENSE.md). 
 
 * **Commercial Entities & Businesses:** Any use of this software to generate revenue, conduct commercial operations, or use within a corporate/business environment requires a paid **Commercial License**.
-* **Everybode Else:** You are free to use, modify, and distribute this software for personal, educational, or research purposes.
+* **Everybody Else:** You are free to use, modify, and distribute this software for personal, educational, research, or charitable purposes.
 
 ##### 💼 Commercial Licensing & Enterprise Support
 If you wish to use this application for commercial purposes contact us at:
 
 📧  [fonecall@lifesrain.com](mailto:fonecall@lifesrain.com)
+
  
