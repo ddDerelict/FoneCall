@@ -65,6 +65,8 @@ FoneCall is a native Windows desktop application built to bridge the gap between
 
 ## Download and Installation
 Installing FnseCall does not require Administrator privileges. The installation package is a standard Windows installer executable that can be run from any user account. Because FoneCall connects with an individual's smartphone via scrcpy FoneCall is installed in one user's AppData\Local\Programs directory. The DB and log files are stored in the user's AppData\Local\FoneCall directory. The installation process is fast, straightforward and does not require any special configuration.
+<br/>
+*Note: Because our installer is configured for "User-Mode", it will install cleanly into your user directory aviding the "Do you want allow this app ..." message when starting FoneCall.*
 
 ### 1. Download FoneCall
 Get the latest installation package directly from our repository
@@ -81,3 +83,17 @@ Get the latest installation package directly from our repository
 
 *   **scrcpy:** This project relies on the open-source engine developed by Genymobile.
 *   **Development:** FoneCall functions as a standalone third-party interface utility. The developer highly appreciates the contributions made by the scrcpy development team and the global open-source community.
+
+ 
+#### ⚖️ Licensing & Commercial Use
+
+This software is distributed under the **PolyForm Noncommercial License 1.0.0**. 
+
+* **Commercial Entities & Businesses:** Any use of this software to generate revenue, conduct commercial operations, or use within a corporate/business environment requires a paid **Commercial License**.
+* **Everybode Else:** You are free to use, modify, and distribute this software for personal, educational, or research purposes.
+
+##### 💼 Commercial Licensing & Enterprise Support
+If you wish to use this application for commercial purposes contact us at:
+
+📧  [fonecall@lifesrain.com](mailto:fonecall@lifesrain.com)
+ 

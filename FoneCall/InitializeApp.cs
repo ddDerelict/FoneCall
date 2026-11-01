@@ -29,19 +29,20 @@ namespace FoneCall
             /// n.b..I believe problem could be solved with SuspendLayout() see RunOptMngr
 
             _logMsgs = new StringBuilder();
+            await RunChecks( startHeader: true );
             #region logging header
             string filler5 = new string( '=', 5 ),
                    ver = DBC.KVP_GetValu<string>( KVP_Keys.Version );
             var netVer = RuntimeInformation.FrameworkDescription;
-            LogR.Norm( $"\n\n{filler5} Starting FoneCall {Xfer.RunDate}" +
-                       $" || {netVer} {filler5}\n" +
-                       $"EXE DIR {Paths.AppExeFQN}\n" +
+            LogR.Norm( $"\n\n{filler5} Starting FoneCall {Xfer.RunDate} {filler5}\n" +
+                       $"WRK DIR {Directory.GetCurrentDirectory()}\n" +
+                       $"EXE DIR {Paths.AppExeDir}\n" +
+                       $"EXE FQN {Paths.AppExeFQN}\n" +
                        $"DB File {Paths.AppDB}\n" +
                        $"Logging {Paths.AppLog}\n" +
-                       $"scrcpy {ver} || SQLite v{DBC.GetSQLiteVersion()}" );
+                       $"scrcpy v{ver} || SQLite v{DBC.GetSQLiteVersion()} || {netVer} " );
             #endregion
 
-            await RunChecks( startHeader: true );
             LogR.Norm( _logMsgs.ToString() );
 
             //DBC.UpdateKVP( KVP_Keys.FirstRun, "true" ); // for testing
@@ -85,37 +86,37 @@ namespace FoneCall
             // Guard: if help file is missing or empty, do nothing and do not throw
             try
             {
-                if (!File.Exists(fqnHelp))
+                if (!File.Exists( fqnHelp ))
                 {
-                    LogR.Norm($"SaveOptsToDB: help file not found: {fqnHelp}");
+                    LogR.Norm( $"SaveOptsToDB: help file not found: {fqnHelp}" );
                     return;
                 }
 
-                string[] opt = File.ReadAllLines(fqnHelp);
+                string[] opt = File.ReadAllLines( fqnHelp );
                 if (opt == null || opt.Length == 0)
                 {
-                    LogR.Norm($"SaveOptsToDB: help file empty: {fqnHelp}");
+                    LogR.Norm( $"SaveOptsToDB: help file empty: {fqnHelp}" );
                     return;
                 }
 
-                var lines = opt.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+                var lines = opt.Where( s => !string.IsNullOrWhiteSpace( s ) ).ToArray();
                 var sb = new StringBuilder();
                 for (int i = 0; i < lines.Length; i++)
                 {
                     var line = lines[i];
-                    if (string.IsNullOrEmpty(line)) continue;
+                    if (string.IsNullOrEmpty( line )) continue;
 
-                    if (line.StartsWith("Options"))
+                    if (line.StartsWith( "Options" ))
                     {
                         role = "ARG";
                         optTxt = "Options:/Arguments";
                         explain = $"Options impacting scrcpy execution during initialization and after phone is mirrored on the computer screen.\n" +
                                   $"data source: Help for scrcpy 4.1 on {DateTime.Now: yyyy MMM dd}";
-                        save2db(role, optTxt, explain);
+                        save2db( role, optTxt, explain );
                         hderLine = -1;
                         sb.Clear();
                     }
-                    else if (line.StartsWith("    -"))
+                    else if (line.StartsWith( "    -" ))
                     {
                         // header for an option within current role
                         optTxt = line.Trim();
@@ -124,13 +125,13 @@ namespace FoneCall
 
                         // collect following lines until next header or top-level section
                         int j = i + 1;
-                        while (j < lines.Length && !lines[j].StartsWith("    -"))
+                        while (j < lines.Length && !lines[j].StartsWith( "    -" ))
                         {
-                            sb.Append((sb.Length == 0) ? lines[j].Trim() : "\n" + lines[j].Trim());
+                            sb.Append( (sb.Length == 0) ? lines[j].Trim() : "\n" + lines[j].Trim() );
                             j++;
                         }
 
-                        save2db(role, optTxt, sb.ToString());
+                        save2db( role, optTxt, sb.ToString() );
                         i = j - 1; // skip processed lines
                     }
                 }
@@ -138,13 +139,13 @@ namespace FoneCall
             catch (Exception ex)
             {
                 // log and swallow so tests that expect no-throw on missing/empty file behave correctly
-                LogR.Norm($"SaveOptsToDB exception: {ex}");
+                LogR.Norm( $"SaveOptsToDB exception: {ex}" );
             }
 
-            void save2db(string r, string o, string e)
+            void save2db( string r, string o, string e )
             {
                 Args args = new Args { Role = r, Arg = o, Explain = e };
-                DBC.SaveArgs_Model(args);
+                DBC.SaveArgs_Model( args );
             }
         }
         public static void SaveRTFtoDB()
@@ -167,36 +168,80 @@ namespace FoneCall
         }
         private static async Task RunChecks( bool startHeader )
         {
-            string msg = "";
-
+            bool dbOK = false;
+            string exMsg = string.Empty;
             try
             {
                 #region Perform Startup checks
                 if (Directory.Exists( Paths.AppData ))
                 {
-                    bool dbOK = await DBC.CheckDB();
-                    _logMsgs.AppendLine( $"DB integrity OK = {dbOK}" );
-                    if (!dbOK) callMsgBx( noLog: false, noDataDir: false, notCatch: true, ex: null );
+                    if (File.Exists( Paths.AppDB ))
+                    {
+                        dbOK = await DBC.CheckDB();
+                        _logMsgs.AppendLine( $"DB integrity OK = {dbOK}" );
+                        if (!dbOK) callMsgBx( noDataDir: false, caught: false, noLog: false );
+                    }
+                    else callMsgBx( noDataDir: false, caught: false, noLog: false );
+
+                    if (!File.Exists( Paths.AppLog ))
+                        callMsgBx( noDataDir: false, caught: false, noLog: true );
+
                 }
-                else callMsgBx( noLog: false, noDataDir: true, notCatch: true, ex: null );
+                else callMsgBx( noDataDir: true, caught: false, noLog: false );
                 #endregion
             }
             catch (Exception ex)
             {
-                callMsgBx( noLog: false, noDataDir: false, notCatch: false, ex );
+                exMsg = ex.Message;
+                callMsgBx( noDataDir: false, caught: true, noLog: false );
             }
 
             LogSizeCheck();
 
-            void callMsgBx( bool noLog, bool noDataDir, bool notCatch, Exception ex )
+            void callMsgBx( bool noDataDir, bool caught, bool noLog )
             {
+                #region msgBox msg
+                string mising = noLog ? $"log file ({Paths.AppLog})"
+                                        : $"data directory ({Paths.AppData})";
+                string noFixTxt = noDataDir ? $"({mising} is missing"
+                                          : $"database ({Paths.AppDB}) is missing or corrupt";
+                string intro = noDataDir || !dbOK ? $"The FoneCall {noFixTxt}."
+                                          : $"FoneCal encountered an error during startup: {exMsg}";
+                string hope = caught ? "If this message is a rare event the failure " +
+                             "may be transitory.  Otherwise FoneCall may have become corrupted" +
+                             "and reinstalling might solve the problem."
+                             : noLog ? ""
+                               : "You may be able to restore it from your routine backups" +
+                                 " otherwise you will need to reinstall FoneCall.";
+                string action = caught ? "You can \"Restart\" or \"Exit\" FoneCall"
+                             : noLog ? "A new log will be started"
+                              : "FoneCall will now exit";
+
+                string msg = $"{intro} " +
+                            $"{Xfer.Splitter2}" +
+                            $"{hope}\n\n" +
+                            $"{action}.";
+                #endregion
                 #region MSGBOX PARAMETERS
-                _cmb.I_MsgType = States.Fail;
+                _cmb.I_MsgType = noLog ? States.Warn : States.Fail;
                 _cmb.I_Msg = msg;
-                _cmb.I_Txt_Btn1 = noLog ? "New Log" : notCatch ? "Exit" : "OK";
+                _cmb.I_Txt_Btn1 = noLog ? "OK" : "Exit";
+                if (caught) _cmb.I_Txt_Btn2 = "Restart";
                 #endregion
                 string mbReturn = WinCtrl.CstmmMB_Call( _cmb );
-                LogR.Norm( $"Warning option selected: {mbReturn}" );
+                if (mbReturn == "Exit" || noDataDir || !dbOK)
+                {
+                    LogR.Norm( "Startup error prevented FoneCall initialization -- exiting" );
+                    Environment.Exit( 0 ); // no window open yet so Application.Exit fails
+                }
+                else
+                {
+                    // restart creates a new insta nce using existing parameters; i.e. WTS start state etc
+                    // existing instance must be explicitly terminated
+                    LogR.Norm( "Restarting Application" );
+                    Application.Restart();
+                    Environment.Exit( 0 );
+                }
             }
         }
         private static void LogSizeCheck()
@@ -240,7 +285,7 @@ namespace FoneCall
                     for (int i = 0; i < logLines.Length; i++)
                         if (logLines[i].Contains( sessHdr )) appStarts++;
                 }
-                _logMsgs.AppendLine( $"\ttrimmed log in bytes: {new FileInfo( logPath ).Length}" +
+                _logMsgs.AppendLine( $"Log in bytes: {new FileInfo( logPath ).Length}" +
                               $" || lines: {logLines.Length}" +
                               $" || starts in log: {appStarts}" );
             }

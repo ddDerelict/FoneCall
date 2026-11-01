@@ -17,6 +17,7 @@ DisableWelcomePage=yes
 SetupIconFile="FoneCall.ico"
 AppReadmeFile=README.txt
 InfoBeforeFile=license.txt
+InfoBeforeFile=LICENSE.rtf
 WizardStyle=dark
 Compression=lzma2
 SolidCompression=yes

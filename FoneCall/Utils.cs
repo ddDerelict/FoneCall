@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define PORTABLE
+
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data.SQLite;
@@ -19,8 +21,20 @@ namespace FoneCall
 {
     public class Paths
     {
+        public static string GetAppDataDirectory()
+        {
+            #if PORTABLE
+                // Portable Version: Look inside the local executing directory
+                return AppDomain.CurrentDomain.BaseDirectory;
+            #else
+                        // Installer Version: Look inside the user's Local AppData folder
+                        return Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData ), "FoneCall" );
+            #endif
+        }
+
         // gets the app's exe directory
-        public static string AppExeDir { get; } = AppContext.BaseDirectory;
+        public static string AppExeDir { get; } = AppDomain.CurrentDomain.BaseDirectory;
+        //public static string AppExeDir { get; } = AppContext.BaseDirectory;
         public static string AppExeFQN { get; } = Application.ExecutablePath;
 
         // apparently user only has access rights to CommonApplicationData if they & app run as Admin
